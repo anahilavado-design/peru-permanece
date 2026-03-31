@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>El Perú que permanece</title>
+<meta name="description" content="Herramienta ciudadana para las elecciones del 12 de abril. No te dice por quién votar — te da las preguntas que nadie hace en los debates.">
+<meta property="og:title" content="El Perú que permanece">
+<meta property="og:description" content="No te dice por quién votar. Te da las preguntas que nadie hace en los debates — para que votes pensando no solo en ti.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://anahilavado-design.github.io/peru-permanece">
+<meta property="og:locale" content="es_PE">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F6F3ED;--ink:#1A1814;--ink2:#5A5650;--ink3:#9A9490;
+  --r:#C84B2F;--g:#2F6B5E;--a:#C4871A;
+  --line:rgba(26,24,20,0.1);--card:#FFFFFF;
+  --r-bg:#FAEEE9;--g-bg:#EDF4F2;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:17px;line-height:1.65;overflow-x:hidden}
+
+/* PANTALLAS */
+.pantalla{display:none;min-height:100vh}
+.pantalla.activa{display:block;animation:fadeUp 0.3s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* BARRA NAV */
+.barra{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding:11px 20px;display:flex;align-items:center;gap:10px}
+.barra-btn{font-size:13px;color:var(--ink3);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;transition:color 0.15s;white-space:nowrap}
+.barra-btn:hover{color:var(--ink)}
+.barra-dots{display:flex;gap:5px;align-items:center;flex:1;justify-content:center}
+.dot{height:4px;border-radius:2px;background:var(--line);transition:all 0.3s;width:8px}
+.dot.on{background:var(--ink);width:20px}
+.dot.done{background:var(--ink3)}
+
+/* TIPO */
+.f-display{font-family:'Fraunces',serif;font-size:clamp(28px,8vw,44px);font-weight:300;line-height:1.1}
+.f-display em{font-style:italic;color:var(--r)}
+.f-h2{font-family:'Fraunces',serif;font-size:clamp(20px,5vw,28px);font-weight:300;line-height:1.2}
+.f-h2 em{font-style:italic}
+.f-h3{font-family:'Fraunces',serif;font-size:clamp(17px,4vw,22px);font-weight:300;line-height:1.25}
+.f-h3 em{font-style:italic}
+.f-sub{font-family:'Fraunces',serif;font-size:17px;font-weight:300;font-style:italic;line-height:1.35}
+.f-body{font-size:15px;color:var(--ink2);line-height:1.7}
+.f-small{font-size:13px;color:var(--ink3)}
+.f-label{font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3)}
+
+/* ESPACIADO */
+.pad{padding:28px 22px}
+.pad-h{padding-left:22px;padding-right:22px}
+.s8{margin-bottom:8px}
+.s12{margin-bottom:12px}
+.s20{margin-bottom:20px}
+.s28{margin-bottom:28px}
+.divider{height:1px;background:var(--line)}
+
+/* BOTONES */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:12px 20px;border-radius:2px;cursor:pointer;border:none;width:100%;transition:all 0.2s;text-align:center}
+.btn-dark{background:var(--ink);color:var(--bg)}
+.btn-dark:hover{background:var(--r)}
+.btn-outline{background:none;color:var(--ink);border:1px solid var(--line)}
+.btn-outline:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn-link{background:none;color:var(--ink3);border:none;font-size:13px;padding:8px 0;width:auto;justify-content:flex-start}
+.btn-link:hover{color:var(--ink)}
+
+/* HOME */
+.home-wrap{position:relative;overflow:hidden;padding:44px 22px 36px}
+.hero-deco{position:absolute;right:-4px;top:4px;font-family:'Fraunces',serif;font-size:110px;font-weight:700;color:rgba(26,24,20,0.04);pointer-events:none;line-height:1}
+.flag{display:inline-flex;gap:3px;margin-right:6px}
+.flag span{width:9px;height:9px;border-radius:1px}
+.flag-r{background:var(--r)}
+.flag-w{background:#fff;border:1px solid var(--line)}
+.home-nota{font-size:12px;color:var(--ink3);line-height:1.5;padding:10px 14px;border-left:2px solid var(--line);margin-bottom:28px}
+
+/* CTA CARDS */
+.cta-stack{display:flex;flex-direction:column;gap:10px}
+.cta-card{border:1px solid var(--line);border-radius:8px;padding:16px 48px 16px 18px;cursor:pointer;transition:all 0.2s;background:var(--card);position:relative;text-align:left;width:100%;font-family:'DM Sans',sans-serif}
+.cta-card:hover{border-color:var(--ink);background:var(--bg)}
+.cta-card-a{border-left:3px solid var(--ink)}
+.cta-card-b{border-left:3px solid var(--ink3)}
+.cta-tiempo{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;display:block}
+.cta-tit{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:4px;line-height:1.3;display:block}
+.cta-desc{font-size:13px;color:var(--ink2);line-height:1.5;display:block}
+.cta-arrow{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--ink3)}
+.cta-card:hover .cta-arrow{color:var(--ink)}
+
+/* REALIDADES */
+.r-card{margin:0 22px 12px;padding:18px;border:1px solid var(--line);border-radius:8px;background:var(--card);transition:border-color 0.2s}
+.r-card.done{border-color:rgba(26,24,20,0.25)}
+.r-pregunta{font-size:15px;font-weight:500;color:var(--ink);line-height:1.45;margin-bottom:14px}
+.r-resp{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);animation:fadeUp 0.3s ease both}
+.r-num{font-family:'Fraunces',serif;font-size:36px;font-weight:300;color:var(--ink);line-height:1;margin-bottom:10px}
+.r-txt{font-size:15px;color:var(--ink2);line-height:1.7;margin-bottom:8px}
+.r-fuente{font-size:12px;color:var(--ink3);font-style:italic}
+.r-next{margin-top:10px;font-size:13px;color:var(--ink3);font-style:italic;line-height:1.5;padding-top:8px;border-top:1px dashed var(--line)}
+.btn-rev{font-size:13px;font-weight:500;background:var(--ink);color:var(--bg);border:none;padding:9px 18px;border-radius:2px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s}
+.btn-rev:hover{background:var(--r)}
+
+/* REFLEXIÓN */
+.reflexion{margin:16px 22px;padding:18px;background:var(--ink);border-radius:8px}
+.reflexion p{font-size:14px;line-height:1.7;color:rgba(246,243,237,0.75);margin-bottom:12px}
+.reflexion p strong{color:var(--bg);font-weight:500}
+.reflexion-q{font-family:'Fraunces',serif;font-size:17px;font-weight:300;font-style:italic;line-height:1.35;color:var(--bg)}
+
+/* NAV TEMAS */
+.nav-temas{display:flex;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;background:var(--bg);position:sticky;top:52px;z-index:10}
+.nav-temas::-webkit-scrollbar{display:none}
+.t-tab{flex:0 0 auto;padding:13px 20px;font-size:12px;font-weight:500;color:var(--ink3);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.t-tab:hover{color:var(--ink)}
+.t-tab.on{color:var(--ink);border-bottom-color:var(--tc)}
+.t-panel{display:none}
+.t-panel.on{display:block;animation:fadeUp 0.3s ease both}
+.t-ctx{font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:20px;padding-left:14px;border-left:2px solid var(--tc,var(--r))}
+
+/* NOTICIAS */
+.noticia{padding:13px 15px;background:var(--card);border:1px solid var(--line);border-radius:6px;font-size:14px;color:var(--ink);line-height:1.5;margin-bottom:8px}
+.noticia-sub{font-size:13px;color:var(--ink3);margin-top:5px;font-style:italic}
+
+/* HISTORIA */
+.historia{background:var(--ink);color:var(--bg);border-radius:6px;padding:18px;cursor:pointer}
+.h-lugar{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:rgba(246,243,237,0.5);margin-bottom:8px}
+.h-tit{font-family:'Fraunces',serif;font-size:16px;font-weight:300;font-style:italic;line-height:1.4;color:var(--bg);margin-bottom:10px}
+.h-mas{display:none;padding-top:10px;border-top:1px solid rgba(246,243,237,0.15)}
+.historia.open .h-mas{display:block}
+.h-det{font-size:13px;line-height:1.65;color:rgba(246,243,237,0.75);margin-bottom:8px}
+.h-fuente{font-size:12px;font-style:italic;color:rgba(246,243,237,0.5)}
+
+/* ACORDEONES */
+.ac{border:1px solid var(--line);border-radius:6px;margin-bottom:6px;overflow:hidden;background:var(--card)}
+.ac:hover{border-color:rgba(26,24,20,0.2)}
+.ac-hd{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 16px;cursor:pointer;gap:10px}
+.ac-q{font-size:14px;font-weight:500;line-height:1.5;color:var(--ink);flex:1}
+.ac-tog{flex:0 0 18px;font-size:16px;color:var(--ink3);transition:transform 0.2s}
+.ac.open .ac-tog{transform:rotate(45deg)}
+.ac-body{display:none;padding:0 16px 14px;border-top:1px solid var(--line)}
+.ac.open .ac-body{display:block}
+.ac-txt{font-size:14px;line-height:1.65;color:var(--ink2);margin-top:12px}
+.alerta{margin-top:10px;padding:9px 12px;background:var(--r-bg);border-left:2px solid var(--r);border-radius:2px;font-size:13px;line-height:1.55;color:#7A2A15}
+.positivo{margin-top:8px;padding:9px 12px;background:var(--g-bg);border-left:2px solid var(--g);border-radius:2px;font-size:13px;line-height:1.55;color:#1E4D43}
+
+/* CONTRATO */
+.contrato{padding:18px;background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:20px}
+.contrato-q{font-family:'Fraunces',serif;font-size:17px;font-weight:300;font-style:italic;line-height:1.35;color:var(--ink);margin-bottom:8px}
+.contrato-txt{font-size:14px;color:var(--ink2);line-height:1.7}
+.contrato-txt strong{color:var(--ink);font-weight:500}
+
+/* CHECKLIST */
+.cl{background:var(--ink);border-radius:6px;padding:20px}
+.cl-tit{font-family:'Fraunces',serif;font-size:16px;font-weight:300;font-style:italic;margin-bottom:4px;color:var(--bg)}
+.cl-sub{font-size:12px;color:rgba(246,243,237,0.45);margin-bottom:16px}
+.cl-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;cursor:pointer}
+.cl-box{flex:0 0 18px;width:18px;height:18px;border:1.5px solid rgba(246,243,237,0.3);border-radius:2px;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all 0.15s;font-size:10px;color:transparent}
+.cl-item.on .cl-box{background:var(--tc,var(--r));border-color:var(--tc,var(--r));color:white}
+.cl-txt{font-size:13px;line-height:1.5;color:rgba(246,243,237,0.75)}
+.cl-item.on .cl-txt{color:rgba(246,243,237,0.35);text-decoration:line-through}
+.cl-count{margin-top:14px;padding-top:12px;border-top:1px solid rgba(246,243,237,0.1);font-size:12px;color:rgba(246,243,237,0.4)}
+.cl-count span{color:var(--bg);font-weight:500}
+
+/* TEMA NAV FOOTER */
+.t-nav-footer{padding:18px 22px;border-top:1px solid var(--line)}
+.t-nav-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.t-nav-label{font-size:11px;color:var(--ink3)}
+
+/* FILTROS */
+.filtros{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--card)}
+.filtros-hd{padding:14px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.filtros-tit{font-size:14px;font-weight:500;color:var(--ink)}
+.filtros-tog{font-size:18px;color:var(--ink3);transition:transform 0.2s}
+.filtros.open .filtros-tog{transform:rotate(45deg)}
+.filtros-body{display:none;padding:14px 16px;border-top:1px solid var(--line)}
+.filtros.open .filtros-body{display:block}
+.filtro{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.filtro:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.filtro-q{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:6px;line-height:1.4}
+.filtro-exp{font-size:13px;color:var(--ink2);line-height:1.65}
+
+/* DEEP DIVE */
+.deepdive{padding:15px 17px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.dd-label{font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
+.dd-desc{font-size:13px;color:var(--ink2);line-height:1.5;margin-bottom:12px}
+
+/* BLANCO */
+.blanco{border:1px solid var(--line);border-radius:6px;background:var(--card)}
+.blanco-hd{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer}
+.blanco-tit{font-size:14px;font-weight:500;color:var(--ink)}
+.blanco-tog{font-size:18px;color:var(--ink3);transition:transform 0.2s}
+.blanco.open .blanco-tog{transform:rotate(45deg)}
+.blanco-body{display:none;padding:0 16px 14px;border-top:1px solid var(--line)}
+.blanco.open .blanco-body{display:block}
+.blanco-pt{font-size:14px;color:var(--ink2);line-height:1.65;margin-bottom:10px;padding-left:14px;position:relative}
+.blanco-pt::before{content:'';position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:50%;background:var(--ink3)}
+.blanco-pt strong{color:var(--ink);font-weight:500}
+
+/* KIT */
+.kit-card{display:block;padding:14px 16px;border:1px solid var(--line);border-radius:6px;margin-bottom:8px;text-decoration:none;background:var(--card);transition:border-color 0.15s}
+.kit-card:hover{border-color:rgba(26,24,20,0.25)}
+.kit-nom{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:3px}
+.kit-desc{font-size:13px;color:var(--ink2);line-height:1.5}
+.tag{display:inline-block;font-size:10px;font-weight:500;padding:2px 6px;border-radius:2px;margin-left:6px;vertical-align:middle}
+.tag-g{background:var(--g-bg);color:var(--g)}
+.tag-p{background:#F0EEF8;color:#534AB7}
+
+/* IDIOMAS */
+.idiomas{padding:12px 14px;border:1px solid var(--line);border-radius:6px;font-size:13px;color:var(--ink2);line-height:1.6;background:var(--card)}
+
+/* CICLO 1 */
+.ciclo1{background:var(--ink);border-radius:6px;padding:22px;text-align:center}
+.c1-tit{font-family:'Fraunces',serif;font-size:18px;font-weight:300;font-style:italic;color:var(--bg);margin-bottom:6px}
+.c1-sub{font-size:13px;color:rgba(246,243,237,0.55);line-height:1.6;margin-bottom:16px}
+.c1-btn{display:inline-block;background:var(--bg);color:var(--ink);font-size:13px;font-weight:500;padding:10px 22px;border-radius:2px;text-decoration:none;font-family:'DM Sans',sans-serif}
+
+/* PLANCHA */
+.plancha-alerta{padding:14px 16px;background:var(--r-bg);border-left:2px solid var(--r);border-radius:2px;font-size:14px;line-height:1.65;color:#7A2A15}
+</style>
+</head>
+<body>
+
+<!-- ══ P0 · HOME ══ -->
+<div class="pantalla activa" id="p0">
+  <div class="home-wrap">
+    <div class="hero-deco">PE</div>
+    <div class="s20">
+      <span class="flag"><span class="flag-r"></span><span class="flag-w"></span><span class="flag-r"></span></span>
+      <span class="f-label">Elecciones · 12 de abril 2026</span>
+    </div>
+    <h1 class="f-display s20"><em>¿Alguna vez sentiste que da igual quién gana?</em></h1>
+    <p class="f-body s8">Porque cada gobierno llega como si gobernara solo para los años que le tocan — y borra lo que hizo el anterior.</p>
+    <p class="f-body s28">Esta herramienta no te dice por quién votar. Te da las preguntas que nadie hace en los debates — para que votes pensando no solo en ti.</p>
+    <p class="f-body s28" style="font-size:15px;color:var(--ink);font-weight:500">Si llegaste hasta aquí, ya tomaste la decisión más importante: votar con criterio.</p>
+    <p class="home-nota">Solo disponible en español. El Ciclo 1 incluirá quechua y aymara — porque el Perú habla más de un idioma.</p>
+    <div class="cta-stack">
+      <button class="cta-card cta-card-a" onclick="irA('p1')">
+        <span class="cta-tiempo">Camino completo · ~8 min</span>
+        <span class="cta-tit">Quiero entender el país antes de votar</span>
+        <span class="cta-desc">Cuatro realidades que quizás no sabías — y las preguntas para votar con criterio.</span>
+        <span class="cta-arrow">→</span>
+      </button>
+      <button class="cta-card cta-card-b" onclick="irA('p3')">
+        <span class="cta-tiempo">Directo al grano · ~4 min</span>
+        <span class="cta-tit">¿Cómo votar cuando ninguno convence?</span>
+        <span class="cta-desc">Las preguntas clave para evaluar propuestas — sin rodeos.</span>
+        <span class="cta-arrow">→</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ P1 · REALIDADES ══ -->
+<div class="pantalla" id="p1">
+  <nav class="barra">
+    <button class="barra-btn" onclick="irA('p0')">← Inicio</button>
+    <div class="barra-dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+    <span class="f-small">1 de 3</span>
+  </nav>
+
+  <div class="pad">
+    <div class="f-label s12">El país que vas a votar</div>
+    <h2 class="f-h2 s12">¿Cuánto conoces el Perú del que eres parte?</h2>
+    <p class="f-body s20" style="font-size:14px">No es un test. Son cuatro realidades que quizás no sabías — o nunca habías visto juntas.</p>
+  </div>
+
+  <div class="r-card" id="r1">
+    <p class="r-pregunta">¿Sabes cuántos peruanos trabajan sin contrato, sin seguro y sin pensión?</p>
+    <button class="btn-rev" onclick="rev('r1')">Ver la respuesta</button>
+    <div class="r-resp" id="r1-resp" style="display:none">
+      <div class="r-num">7 de cada 10</div>
+      <p class="r-txt">No es flojera. Es que en el Perú, trabajar con contrato y seguro tiene un costo — para el trabajador y para quien lo contrata. El sistema hace que sea más rápido y más barato no cumplir las reglas. Y así llevamos décadas.</p>
+      <p class="r-fuente">INEI, 2025</p>
+      <p class="r-next">¿Y eso cómo afecta a lo que llega a tu región?</p>
+    </div>
+  </div>
+
+  <div class="r-card" id="r2">
+    <p class="r-pregunta">¿Sabes qué tienen en común los departamentos más ricos en minerales y los más pobres del país?</p>
+    <button class="btn-rev" onclick="rev('r2')">Ver la respuesta</button>
+    <div class="r-resp" id="r2-resp" style="display:none">
+      <div class="r-num" style="font-size:30px;line-height:1.15">Son los mismos.</div>
+      <p class="r-txt">Cajamarca tiene oro, plata y cobre — y el 45% de su gente no llega a cubrir lo básico. Loreto tiene petróleo — y el 43% vive en pobreza. Puno tiene minería y gas — el 40% en pobreza. Pasco (39%) y Huánuco (39%), lo mismo. Son las regiones que producen la riqueza del país. Y las que menos se quedan con ella.</p>
+      <p class="r-fuente">INEI, 2024</p>
+      <p class="r-next">¿Y el acceso al agua?</p>
+    </div>
+  </div>
+
+  <div class="r-card" id="r3">
+    <p class="r-pregunta">¿Sabes cuántos hogares peruanos no tienen agua potable en casa?</p>
+    <button class="btn-rev" onclick="rev('r3')">Ver la respuesta</button>
+    <div class="r-resp" id="r3-resp" style="display:none">
+      <div class="r-num">1 de cada 3 hogares</div>
+      <p class="r-txt">Fuera de Lima, 1 de cada 3 hogares no tiene agua potable en casa. No es solo Loreto — es Ucayali, Huancavelica, Amazonas. En gran parte del país, tener agua depende de si el Estado llegó a tu comunidad.</p>
+      <p class="r-fuente">INEI ENAPRES, 2023</p>
+      <p class="r-next">¿Y cuando la gente reclama? Así termina.</p>
+    </div>
+  </div>
+
+  <div class="r-card" id="r4">
+    <p class="r-pregunta">¿Sabes cuántos conflictos sociales activos hay en el Perú ahora mismo?</p>
+    <button class="btn-rev" onclick="rev('r4')">Ver la respuesta</button>
+    <div class="r-resp" id="r4-resp" style="display:none">
+      <div class="r-num">193</div>
+      <p class="r-txt">En enero 2026, la Defensoría del Pueblo registró 193 conflictos activos. La mitad son por recursos naturales — comunidades que pelean por el agua, la tierra o el aire. La mayoría están en Loreto, Puno y Áncash — exactamente las regiones con más minería y petróleo. No es coincidencia.</p>
+      <p class="r-fuente">Defensoría del Pueblo, febrero 2026</p>
+    </div>
+  </div>
+
+  <div class="reflexion">
+    <p>Todo esto pasó con distintos gobiernos — de derecha, de izquierda, de centro. El problema no es solo quién gobierna. Es que <strong>nunca hemos construido una estrategia de país que trascienda gobiernos.</strong> Cada uno llega a reinventar, y el que sigue borra lo que hizo el anterior.</p>
+    <div class="reflexion-q">¿Qué le pedimos al próximo gobierno — sabiendo que el Perú que heredará es este?</div>
+  </div>
+
+  <div class="pad">
+    <button class="btn btn-dark s8" onclick="irA('p2')">Ver las preguntas por tema →</button>
+    <button class="btn btn-outline" onclick="irA('p3')">Ir directo a cómo votar →</button>
+  </div>
+</div>
+
+<!-- ══ P2 · TEMAS ══ -->
+<div class="pantalla" id="p2">
+  <nav class="barra">
+    <button class="barra-btn" onclick="irA('p1')">← Anterior</button>
+    <div class="barra-dots"><div class="dot done"></div><div class="dot on"></div><div class="dot"></div></div>
+    <button class="barra-btn" onclick="irA('p0')">Inicio</button>
+  </nav>
+
+  <div class="pad" style="padding-bottom:8px">
+    <div class="f-label s12">Las preguntas que importan</div>
+    <p class="f-sub">Tres temas. Las preguntas que nadie hace en los debates.</p>
+    <p class="f-body" style="font-size:14px;margin-top:8px">No necesitas leer los 36 planes. Necesitas saber qué preguntar — y cómo reconocer una propuesta seria de una que solo suena bien.</p>
+  </div>
+
+  <nav class="nav-temas">
+    <button class="t-tab on" style="--tc:#C84B2F" onclick="tab(0,this)">01 · El trabajo</button>
+    <button class="t-tab" style="--tc:#2F6B5E" onclick="tab(1,this)">02 · El Estado</button>
+    <button class="t-tab" style="--tc:#C4871A" onclick="tab(2,this)">03 · Tu región</button>
+  </nav>
+
+  <!-- T1: TRABAJO -->
+  <div class="t-panel on" id="t0" style="--tc:#C84B2F">
+    <div class="pad" style="padding-bottom:0">
+      <div class="f-label s12">La pregunta que importa</div>
+      <h3 class="f-h3 s12">¿Por qué tanta gente trabaja sin seguro, sin pensión, sin nada — y los gobiernos no lo han podido cambiar?</h3>
+      <p class="t-ctx">7 de cada 10 peruanos trabajan sin contrato, sin seguro médico, sin pensión. No es flojera. Es que el sistema hace que formalizarse cueste más de lo que da a cambio. Y así llevamos décadas.</p>
+    </div>
+    <div class="pad-h s20">
+      <div class="f-label s12">Lo que está pasando ahora</div>
+      <div class="noticia">De cada diez que trabajan en Perú, <strong>siete siguen sin contrato, sin seguro y sin pensión</strong> — 70,7% de informalidad laboral.<div class="noticia-sub">La más alta de América del Sur — OIT 2025</div></div>
+      <div class="noticia">En Lima, <strong>1,6 millones trabajan más de 35 horas semanales</strong> y no cubren los gastos básicos — comida, transporte, servicios. La canasta básica para una familia de cuatro cuesta alrededor de S/ 1.400 al mes.<div class="noticia-sub">INEI, dic 2025–feb 2026</div></div>
+      <div class="noticia">Hay <strong>5,7 millones con empleo formal</strong> — pero todavía existen <strong>11,1 millones sin derechos laborales</strong> básicos.<div class="noticia-sub">MTPE, enero 2025</div></div>
+    </div>
+    <div class="pad-h s20">
+      <div class="f-label s12">Caso real documentado · Juliaca, Puno — INEI 2025</div>
+      <div class="historia" onclick="this.classList.toggle('open')">
+        <div class="h-lugar">Juliaca, Puno</div>
+        <div class="h-tit">"En Juliaca casi todos trabajan en la calle y, aun así, sobra gente sin chamba estable."</div>
+        <div class="h-mas">
+          <p class="h-det">En 2025, Juliaca tuvo una tasa de informalidad de <strong>82,3%</strong> — la ciudad más informal entre las 27 medidas por el INEI. Y a pesar de que "todos trabajan", el desempleo llegó a 8,1%.</p>
+          <p class="h-det">Gran parte del trabajo está en ferias, transporte y comercio callejero, sin contrato ni seguro. Muchas familias juntan varios cachuelos para completar el mes.</p>
+          <p class="h-fuente">Fuente: INEI nota de prensa, feb 2026</p>
+        </div>
+      </div>
+    </div>
+    <div class="pad-h s20">
+      <div class="f-label s12">Preguntas para hacerte al escuchar propuestas</div>
+      <div class="ac" onclick="acordeon(this)"><div class="ac-hd"><span class="ac-q">¿Proponen que sea más fácil y barato trabajar con contrato — o solo amenazan con multas?</span><span class="ac-tog">+</span></div><div class="ac-body"><p class="ac-txt">Las multas no cambian la ecuación. Lo que mueve la aguja es que valga la pena registrarse — que el trámite sea rápido, el costo bajo, y que la formalidad traiga algo concreto: acceso a crédito, protección real.</p><div class="alerta">⚠ Ojo si solo hablan de "fiscalizar más" — eso nunca ha funcionado solo.</div><div class="positivo">✓ Mejor señal: propuestas que reducen trámites y conectan formalización con beneficios concretos.</div></div></div>
+      <div class="ac" onclick="acordeon(this)"><div class="ac-hd"><span class="ac-q">¿Hablan de empleo formal o solo de "crecimiento"? ¿Para quién crece?</span><span class="ac-tog">+</span></div><div class="ac-body"><p class="ac-txt">El Perú creció mucho entre 2002 y 2014 — y la pobreza bajó. Pero desde entonces el crecimiento siguió y la desigualdad se estancó. El crecimiento queda entre las mismas empresas de siempre — no llega al trabajador de a pie.</p><div class="alerta">⚠ Ojo con "haremos crecer el PBI X%". El PBI mide cuánto produce el país — no cómo se reparte.</div></div></div>
+      <div class="ac" onclick="acordeon(this)"><div class="ac-hd"><span class="ac-q">¿Quién paga la propuesta — y con qué plata?</span><span class="ac-tog">+</span></div><div class="ac-body"><p class="ac-txt">El Perú recauda menos impuestos que el promedio regional. Las propuestas de más gasto sin explicar cómo se financia generan deuda o inflación. Y si dicen que van a "recortar de X para financiar Y", pregunta: ¿cuánto vale ese recorte? ¿Alcanza? ¿Quién verifica?</p><div class="alerta">⚠ Ojo con subsidios masivos sin fuente de financiamiento clara.</div></div></div>
+    </div>
+    <div class="contrato"><div class="contrato-q">¿La propuesta le cambia algo a alguien en Huancavelica — o solo a quien ya tiene?</div><div class="contrato-txt">Las políticas que solo benefician a quien ya está en el sistema formal no reducen la desigualdad — la consolidan. <strong>Pregúntate si lo que prometen llega a quien más lo necesita.</strong></div></div>
+    <div class="pad-h s20">
+      <div class="cl" style="--tc:#C84B2F">
+        <div class="cl-tit">Lo que ya tienes claro</div><div class="cl-sub">Marca lo que entendiste</div>
+        <div class="cl-item" onclick="check(this,0)"><div class="cl-box">✓</div><span class="cl-txt">La informalidad no es flojera — el sistema la hace racional</span></div>
+        <div class="cl-item" onclick="check(this,0)"><div class="cl-box">✓</div><span class="cl-txt">Voy a preguntar si reducen costos, no solo si castigan</span></div>
+        <div class="cl-item" onclick="check(this,0)"><div class="cl-box">✓</div><span class="cl-txt">Desconfío de "crecimiento" sin decir para quién</span></div>
+        <div class="cl-item" onclick="check(this,0)"><div class="cl-box">✓</div><span class="cl-txt">Voy a preguntar: ¿con qué plata y quién lo paga?</span></div>
+        <div class="cl-count"><span id="c0">0</span> de 4 claras</div>
+      </div>
+    </div>
+    <div class="t-nav-footer">
+      <div class="t-nav-row"><span class="t-nav-label">1 de 3</span><button class="btn btn-outline" style="width:auto;padding:9px 16px" onclick="tab(1,document.querySelectorAll('.t-tab')[1])">Siguiente tema →</button></div>
+      <button class="btn btn-outline" onclick="irA('p3')">Ir directo a cómo votar →</button>
+    </div>
+  </div>
+
+  <!-- T2: ESTADO -->
+  <div class="t-panel" id="t1" style="--tc:#2F6B5E">
+    <div class="pad" style="padding-bottom:0">
+      <div class="f-label s12">La pregunta que importa</div>
+      <h3 class="f-h3 s12">¿Por qué da igual quién gana si al final <em>siempre pasa lo mismo</em>?</h3>
+      <p class="t-ctx" style="border-left-color:#2F6B5E">9 de cada 10 peruanos desaprueban el Congreso. Más de 8 de cada 10 desaprueban al Ejecutivo. Y sin embargo seguimos eligiendo a gente con las mismas mañas. No es solo que sean malos — es que el sistema está diseñado para que sea muy difícil que alguien honesto llegue y se quede.</p>
+    </div>
+    <div class="pad-h s20">
+      <div class="f-label s12">Lo que está pasando ahora</div>
+      <div class="noticia">La Municipalidad de Lima contrató a <strong>205 militantes de Renovación Popular por S/ 7,2 millones</strong> — pese a que el alcalde había prometido que "de Renovación no entra nadie".<div class="noticia-sub">Ojo Público / Infobae, septiembre 2025</div></div>
+      <div class="noticia">El Congreso impulsó <strong>26 proyectos de ley para "reformar" la justicia</strong> a su medida — incluyendo eliminar la Junta Nacional de Justicia. Freedom House mantuvo a Perú como "parcialmente libre" en 2025.<div class="noticia-sub">Ojo Público, agosto 2025</div></div>
+    </div>
+    <div class="pad-h s20">
+      <div class="f-label s12">Caso real documentado · Huachis, Áncash — Convoca.pe 2024</div>
+      <div class="historia" onclick="this.classList.toggle('open')">
+        <div class="h-lugar">Huachis, Áncash</div>
+        <div class="h-tit">"Prometieron un colegio nuevo en 2009. Los chicos siguen estudiando entre fierros y obra sin terminar."</div>
+        <div class="h-mas">
+          <p class="h-det">En el colegio San Cristóbal de Chupán prometieron en 2009 cinco aulas nuevas, auditorio, biblioteca y losa deportiva. La obra debía terminarse en 210 días. Lleva <strong>más de 14 años paralizada</strong> con solo 66,3% de avance.</p>
+          <p class="h-det">Es uno de <strong>139 proyectos escolares paralizados</strong> en todo el país que afectan a más de 2.800 escolares.</p>
+          <p class="h-fuente">Fuente: Convoca.pe, marzo 2024</p>
+        </div>
+      </div>
+    </div>
+    <div class="pad-h s20">
+      <div class="f-label s12">Preguntas para hacerte al escuchar propuestas</div>
+      <div class="ac" onclick="acordeon(this)"><div class="ac-hd"><span class="ac-q">¿Lo que proponen protege a los jueces y fiscales que investigan corrupción — o les pone trabas?</span><span class="ac-tog">+</span></div><div class="ac-body"><p class="ac-txt">La Fiscalía, la Contraloría, la JNJ y los organismos electorales son el sistema inmune de la democracia. Cuando se debilitan — por leyes del Congreso o nombramientos políticos — el Estado pierde capacidad de detectar corrupción.</p><div class="alerta">⚠ Ojo si hablan de "reformar la justicia" pero proponen que los políticos elijan a los jueces. Eso no es reforma — es control.</div><div class="positivo">✓ Mejor señal: candidatos con posición clara sobre casos concretos, no solo discurso anticorrupción en abstracto.</div></div></div>
+      <div class="ac" onclick="acordeon(this)"><div class="ac-hd"><span class="ac-q">¿El partido tiene proyecto real — o es un vehículo personal para llegar al poder?</span><span class="ac-tog">+</span></div><div class="ac-body"><p class="ac-txt">Perú tiene uno de los sistemas de partidos más débiles de la región. La mayoría son vehículos electorales sin ideología ni cuadros. Sin partido real, no hay nadie que les exija resultados cuando gobiernen.</p><div class="alerta">⚠ Ojo con partidos creados en los últimos 2 años, centrados 100% en la figura del candidato o candidata.</div></div></div>
+      <div class="ac" onclick="acordeon(this)"><div class="ac-hd"><span class="ac-q">Cuando gobernaron antes — ¿a quién le fue mejor?</span><span class="ac-tog">+</span></div><div class="ac-body"><p class="ac-txt">Los planes los escribe cualquiera. El historial no se inventa. ¿Cómo votó su bancada en el Congreso actual? ¿Qué hicieron en las municipalidades o regiones donde gobernaron? ¿Quedaron obras paralizadas?</p><div class="positivo">✓ Busca en la Contraloría, Convoca.pe u Ojo Público cómo terminó su gestión anterior.</div></div></div>
+    </div>
+    <div class="contrato"><div class="contrato-q">¿Quién gana cuando gana este candidato — solo sus aliados, o también tu vecino?</div><div class="contrato-txt">Tu voto no es solo un juicio sobre el candidato. Es una señal sobre qué tipo de país queremos ser. <strong>Un gobierno que solo cuida a los que ya tienen poder no es un gobierno para todos — aunque diga serlo.</strong></div></div>
+    <div class="pad-h s20">
+      <div class="cl" style="--tc:#2F6B5E">
+        <div class="cl-tit">Lo que ya tienes claro</div><div class="cl-sub">Marca lo que entendiste</div>
+        <div class="cl-item" onclick="check(this,1)"><div class="cl-box">✓</div><span class="cl-txt">El problema institucional es de diseño, no solo de personas malas</span></div>
+        <div class="cl-item" onclick="check(this,1)"><div class="cl-box">✓</div><span class="cl-txt">Voy a mirar si las propuestas fortalecen o debilitan los contrapesos</span></div>
+        <div class="cl-item" onclick="check(this,1)"><div class="cl-box">✓</div><span class="cl-txt">Voy a evaluar el partido y su historial, no solo la figura</span></div>
+        <div class="cl-item" onclick="check(this,1)"><div class="cl-box">✓</div><span class="cl-txt">Voy a preguntar sobre casos concretos, no declaraciones generales</span></div>
+        <div class="cl-count"><span id="c1">0</span> de 4 claras</div>
+      </div>
+    </div>
+    <div class="t-nav-footer">
+      <div class="t-nav-row">
+        <button class="btn btn-outline" style="width:auto;padding:9px 16px" onclick="tab(0,document.querySelectorAll('.t-tab')[0])">← Anterior</button>
+        <button class="btn btn-outline" style="width:auto;padding:9px 16px" onclick="tab(2,document.querySelectorAll('.t-tab')[2])">Siguiente →</button>
+      </div>
+      <button class="btn btn-outline" onclick="irA('p3')">Ir directo a cómo votar →</button>
+    </div>
+  </div>
+
+  <!-- T3: REGION -->
+  <div class="t-panel" id="t2" style="--tc:#C4871A">
+    <div class="pad" style="padding-bottom:0">
+      <div class="f-label s12">La pregunta que importa</div>
+      <h3 class="f-h3 s12">¿Por qué el oro, el gas y el agua salen de las regiones — y <em>la pobreza se queda</em>?</h3>
+      <p class="t-ctx" style="border-left-color:#C4871A">En Puno, Loreto y Huancavelica hay minerales, gas, agua y biodiversidad — y también están los departamentos con más pobreza del país. La plata llega a Lima o se va al exterior. Los gobiernos han prometido "descentralizar" por décadas — pero mandar plata sin asegurar que se use bien no funciona.</p>
+    </div>
+    <div class="pad-h s20">
+      <div class="f-label s12">Lo que está pasando ahora</div>
+      <div class="noticia">En enero 2026, la Defensoría del Pueblo registró <strong>193 conflictos sociales activos</strong>: Loreto (23), Puno (21), Áncash (17). El 51,3% son conflictos por recursos naturales.<div class="noticia-sub">Defensoría del Pueblo, feb 2026</div></div>
+      <div class="noticia">Pobreza monetaria 2024: <strong>Cajamarca 45%, Loreto 43%</strong> — mientras en Ica solo 6%.<div class="noticia-sub">INEI, mayo 2025</div></div>
+      <div class="noticia">Fuera de Lima, <strong>1 de cada 3 hogares no tiene agua potable</strong> en casa. No es solo Loreto — es Ucayali, Huancavelica, Amazonas.<div class="noticia-sub">INEI ENAPRES, 2023</div></div>
+    </div>
+    <div class="pad-h s20">
+      <div class="f-label s12">Caso real documentado · Manco Cápac, Loreto — Servindi / CAAAP 2024</div>
+      <div class="historia" onclick="this.classList.toggle('open')">
+        <div class="h-lugar">Comunidad Manco Cápac · Loreto</div>
+        <div class="h-tit">"En Manco Cápac sacan petróleo para todo el país, pero ni siquiera tienen agua limpia para sus familias."</div>
+        <div class="h-mas">
+          <p class="h-det">En marzo 2024, un derrame de petróleo en el río Puinahua afectó a la comunidad kukama kukamiria de Manco Cápac. Las familias no pueden pescar ni usar el agua del río. Dependen de agua embotellada que llega en cantidades insuficientes.</p>
+          <p class="h-det">Manco Cápac vive junto al Lote 95, <strong>una de las mayores reservas petroleras del país</strong>. Sin agua segura. Sin servicio básico estable.</p>
+          <p class="h-fuente">Fuentes: Servindi + CAAAP + Actualidad Ambiental, marzo 2024</p>
+        </div>
+      </div>
+    </div>
+    <div class="pad-h s20">
+      <div class="f-label s12">Preguntas para hacerte al escuchar propuestas</div>
+      <div class="ac" onclick="acordeon(this)"><div class="ac-hd"><span class="ac-q">¿Mencionan algo específico de tu región — o solo dicen "las regiones" como si fueran todas iguales?</span><span class="ac-tog">+</span></div><div class="ac-body"><p class="ac-txt">Loreto, Puno y Huancavelica no son "la región" — son realidades muy distintas. El test: ¿la propuesta menciona territorios concretos con problemas concretos?</p><div class="alerta">⚠ Ojo con propuestas que hablan de "las regiones" sin diferenciar entre la Amazonía, la sierra sur y la costa.</div></div></div>
+      <div class="ac" onclick="acordeon(this)"><div class="ac-hd"><span class="ac-q">¿Qué pasa con los conflictos socioambientales — los reconocen o los ignoran?</span><span class="ac-tog">+</span></div><div class="ac-body"><p class="ac-txt">Los conflictos en zonas de recursos no son "antimineros vs. progreso". Son señales de que la distribución de beneficios y el proceso de consulta están rotos. Los gobiernos que los ignoran los heredan peor.</p><div class="alerta">⚠ Ojo con candidatos que hablan de "sacar adelante los proyectos" sin decir cómo se resuelve el conflicto previo.</div></div></div>
+      <div class="ac" onclick="acordeon(this)"><div class="ac-hd"><span class="ac-q">¿Cómo van a mejorar servicios en regiones sin solo mandar plata que no se ejecuta?</span><span class="ac-tog">+</span></div><div class="ac-body"><p class="ac-txt">El problema no es solo cuánto presupuesto llega — es que los gobiernos regionales y locales muchas veces no tienen capacidad de ejecutarlo bien. Sin fortalecer esa capacidad, más plata produce más corrupción, no más servicios.</p><div class="positivo">✓ Mejor señal: propuestas que combinan recursos con fortalecimiento de capacidades locales y seguimiento del gasto.</div></div></div>
+    </div>
+    <div class="contrato"><div class="contrato-q">Si no vives en Lima, ¿también te toman en cuenta?</div><div class="contrato-txt">Todos somos un único país — lo que le pasa a alguien en Puno nos afecta a todos. <strong>Un gobierno que extrae la riqueza de las regiones sin devolverles servicios no está gobernando para todos.</strong></div></div>
+    <div class="pad-h s20">
+      <div class="cl" style="--tc:#C4871A">
+        <div class="cl-tit">Lo que ya tienes claro</div><div class="cl-sub">Marca lo que entendiste</div>
+        <div class="cl-item" onclick="check(this,2)"><div class="cl-box">✓</div><span class="cl-txt">Descentralizar no es mandar plata — es construir capacidad real</span></div>
+        <div class="cl-item" onclick="check(this,2)"><div class="cl-box">✓</div><span class="cl-txt">Voy a evaluar si la propuesta menciona territorios concretos</span></div>
+        <div class="cl-item" onclick="check(this,2)"><div class="cl-box">✓</div><span class="cl-txt">Voy a preguntar cómo piensan resolver conflictos, no solo "destrabarlos"</span></div>
+        <div class="cl-item" onclick="check(this,2)"><div class="cl-box">✓</div><span class="cl-txt">El Perú no es Lima — y voy a exigir propuestas que lo demuestren</span></div>
+        <div class="cl-count"><span id="c2">0</span> de 4 claras</div>
+      </div>
+    </div>
+    <div class="t-nav-footer">
+      <div class="t-nav-row"><button class="btn btn-outline" style="width:auto;padding:9px 16px" onclick="tab(1,document.querySelectorAll('.t-tab')[1])">← Tema anterior</button></div>
+      <button class="btn btn-dark s8" onclick="irA('p3')">Ir a cómo votar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ P3 · CÓMO VOTAR ══ -->
+<div class="pantalla" id="p3">
+  <nav class="barra" id="p3-barra">
+    <button class="barra-btn" id="p3-back" onclick="volverP3()">← Anterior</button>
+    <div class="barra-dots">
+      <div class="dot" id="p3-d1"></div>
+      <div class="dot" id="p3-d2"></div>
+      <div class="dot on" id="p3-d3"></div>
+    </div>
+    <button class="barra-btn" onclick="irA('p0')">Inicio</button>
+  </nav>
+
+  <div class="pad">
+    <div class="f-label s12">La pregunta final</div>
+    <h2 class="f-h2 s12">¿Cómo votar cuando <em>ninguno te convence del todo</em>?</h2>
+    <p class="f-body s8">No hay candidato perfecto. Nunca lo hay. La pregunta no es quién es el mejor — es <strong style="color:var(--ink)">quién va a gobernar pensando en todos, no solo en los que ya tienen.</strong></p>
+    <p class="f-body s8">En esta elección no solo eliges presidente o presidenta. Eliges senadores, diputados y parlamento andino. Por los años que le toque gobernar, quien gane necesita al Congreso para ejecutar cualquier cosa.</p>
+    <p class="f-body s20">A veces votar no es elegir al mejor — es elegir al que menos daño hace, y al Congreso que pueda frenarlo si se pasa.</p>
+    <div class="plancha-alerta"><strong>Vota las cinco casillas.</strong> Vota. Pero vota pensando no solo en ti y en tu familia — vota pensando también en tu vecino, en alguien en Cajamarca o en Loreto. Todos somos un único país.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="pad" style="padding-bottom:0">
+    <div class="f-label s12">Antes de votar — cuatro preguntas para cualquier propuesta</div>
+  </div>
+  <div class="pad-h s20">
+    <div class="filtros" onclick="this.classList.toggle('open')">
+      <div class="filtros-hd"><span class="filtros-tit">Toca para ver las 4 preguntas →</span><span class="filtros-tog">+</span></div>
+      <div class="filtros-body">
+        <div class="filtro"><div class="filtro-q">¿La propuesta dice qué va a hacer, cuándo, con cuánta plata y cómo se va a medir?</div><div class="filtro-exp">Un plan que dice "mejoraremos la educación" no es un plan — es un deseo. La vaguedad garantiza impunidad.</div></div>
+        <div class="filtro"><div class="filtro-q">¿Votas en bloque? Quien gane necesita al Congreso para gobernar.</div><div class="filtro-exp">En esta elección eliges todo al mismo tiempo. Si votas en bloque — el mismo partido en todas las casillas — le das a quien elijas el respaldo que necesita. Si divides el voto, asegúrate de entender qué combinación estás armando.</div></div>
+        <div class="filtro"><div class="filtro-q">¿Qué pasó la última vez que tuvieron poder?</div><div class="filtro-exp">No el plan de hoy — los hechos de antes. ¿Cómo votó su bancada en el Congreso actual? ¿Qué hicieron en las municipalidades o regiones donde gobernaron? Busca en la Contraloría, Convoca.pe u Ojo Público.</div></div>
+        <div class="filtro"><div class="filtro-q">¿Rompen algo que funciona?</div><div class="filtro-exp">Perú tiene pocas instituciones que funcionan bien — el BCR, algunas reglas macro, ciertos organismos técnicos. Construirlas tomó décadas. Destruirlas toma meses.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pad-h s20">
+    <div class="deepdive"><div class="dd-label">¿Quieres profundizar en los temas?</div><div class="dd-desc">Trabajo, Estado y territorio — con casos reales y preguntas específicas por área.</div><button class="btn btn-outline" onclick="irA('p2')">Ver los tres temas en detalle →</button></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="pad">
+    <div class="f-label s12">Lo que necesitas para el 12 de abril</div>
+    <p class="f-body s20" style="font-size:14px">No tienes que leer 36 planes de gobierno. Estas herramientas te ayudan.</p>
+    <div class="f-label s12">Conoce a los candidatos</div>
+    <a class="kit-card s8" href="https://www.jne.gob.pe/voto-informado/" target="_blank"><div class="kit-nom">Voto Informado — JNE <span class="tag tag-g">Oficial</span></div><div class="kit-desc">Hojas de vida, planes de gobierno y antecedentes. La fuente más completa y verificada.</div></a>
+    <a class="kit-card s20" href="https://laultimachance.laencerrona.pe/" target="_blank"><div class="kit-nom">La Última Chance <span class="tag tag-p">Ciudadana</span></div><div class="kit-desc">Todas las apps y plataformas para informarte reunidas en un solo lugar.</div></a>
+    <div class="f-label s12">El día de la votación</div>
+    <a class="kit-card s20" href="https://consultaelectoral.onpe.gob.pe/inicio" target="_blank"><div class="kit-nom">Consulta tu local — ONPE <span class="tag tag-g">Oficial</span></div><div class="kit-desc">Dónde votar, en qué mesa, si eres miembro de mesa. Solo tu DNI.</div></a>
+  </div>
+
+  <div class="pad-h s20">
+    <div class="f-label s12">Si nadie te convence del todo</div>
+    <div class="blanco" onclick="this.classList.toggle('open')" style="margin-top:12px">
+      <div class="blanco-hd"><span class="blanco-tit">¿Y si vicio mi voto o voto en blanco? ¿Eso cuenta?</span><span class="blanco-tog">+</span></div>
+      <div class="blanco-body">
+        <div class="blanco-pt" style="margin-top:12px"><strong>A veces votar no es elegir al mejor — es asegurarte de que el peor no gane más de lo que merece.</strong> No necesitas convencerte de nadie para votar con criterio. Votar en blanco no es neutralidad — es una decisión con consecuencias reales.</div>
+        <div class="blanco-pt"><strong>Tu voto en blanco puede ser lo que le falta al partido que menos quieres ver en el Congreso o en la presidencia.</strong> Los resultados se calculan sobre votos válidos. Si 50 de 100 votan en blanco, los 5 votos de un partido ya no son el 5% — son el 10%. Estás duplicando su peso sin querer.</div>
+        <div class="blanco-pt"><strong>Vota los cinco. En bloque o dividido — pero vota.</strong> Recuerda que no solo eliges presidente o presidenta. Eliges senadores, diputados y parlamento andino. Si votas en bloque le das respaldo para gobernar. Si divides el voto, asegúrate de entender qué combinación estás armando. Pero deja las cinco casillas marcadas.</div>
+        <div class="blanco-pt"><strong>Un voto desinformado tiene el mismo peso que uno informado.</strong> Y las consecuencias las vivimos todos. Si quieres informarte rápido — el kit de herramientas está más arriba: tres recursos, menos de 10 minutos.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pad-h s20">
+    <div class="idiomas">Esta herramienta está disponible solo en español. Somos conscientes de que el Perú habla quechua, aymara y otras lenguas — el Ciclo 1 incluirá versiones en los principales idiomas del país.</div>
+  </div>
+
+  <div class="pad-h" style="padding-bottom:40px">
+    <div class="ciclo1"><div class="c1-tit">Entre primera y segunda vuelta, esto crece.</div><div class="c1-sub">Analizaremos a los 2 finalistas: sus planes, cómo quedó el Congreso, y qué hicieron sus partidos cuando tuvieron poder. Si quieres seguir informado desde el inicio — no al final — anótate.</div><a class="c1-btn" href="https://form.typeform.com/to/Sz8INCO9" target="_blank">Avísame para la segunda vuelta →</a></div>
+  </div>
+</div>
+
+<script>
+var counts=[0,0,0];
+var origenP3='p1';
+
+function irA(id){
+  // Registrar origen antes de ir a p3
+  if(id==='p3'){
+    var activa=document.querySelector('.pantalla.activa');
+    origenP3=activa?activa.id:'p0';
+    actualizarP3Barra();
+  }
+  // Ocultar todas
+  var panels=document.querySelectorAll('.pantalla');
+  for(var i=0;i<panels.length;i++){panels[i].classList.remove('activa');}
+  // Mostrar destino
+  var target=document.getElementById(id);
+  if(target){
+    target.classList.add('activa');
+    window.scrollTo(0,0);
+  }
+}
+
+function actualizarP3Barra(){
+  var d1=document.getElementById('p3-d1');
+  var d2=document.getElementById('p3-d2');
+  var d3=document.getElementById('p3-d3');
+  var btn=document.getElementById('p3-back');
+  if(!d1||!d2||!d3||!btn)return;
+  if(origenP3==='p0'){
+    // Camino corto: no hay pasos previos claros
+    d1.className='dot on';
+    d2.className='dot';
+    d3.className='dot';
+    btn.textContent='← Inicio';
+  } else if(origenP3==='p1'){
+    d1.className='dot done';
+    d2.className='dot';
+    d3.className='dot on';
+    btn.textContent='← Anterior';
+  } else {
+    // Viene de p2
+    d1.className='dot done';
+    d2.className='dot done';
+    d3.className='dot on';
+    btn.textContent='← Anterior';
+  }
+}
+
+function volverP3(){
+  irA(origenP3);
+}
+
+function tab(idx,btn){
+  var panels=document.querySelectorAll('.t-panel');
+  var tabs=document.querySelectorAll('.t-tab');
+  for(var i=0;i<panels.length;i++){panels[i].classList.remove('on');}
+  for(var i=0;i<tabs.length;i++){tabs[i].classList.remove('on');}
+  var p=document.getElementById('t'+idx);
+  if(p)p.classList.add('on');
+  if(btn)btn.classList.add('on');
+  window.scrollTo(0,0);
+}
+
+function acordeon(item){
+  var was=item.classList.contains('open');
+  var panel=item.closest('.t-panel');
+  if(panel){var acs=panel.querySelectorAll('.ac');for(var i=0;i<acs.length;i++){acs[i].classList.remove('open');}}
+  if(!was)item.classList.add('open');
+}
+
+function rev(id){
+  var resp=document.getElementById(id+'-resp');
+  var btn=document.querySelector('#'+id+' .btn-rev');
+  if(resp)resp.style.display='block';
+  if(btn)btn.style.display='none';
+  var card=document.getElementById(id);
+  if(card)card.classList.add('done');
+}
+
+function check(item,tema){
+  var was=item.classList.contains('on');
+  item.classList.toggle('on');
+  counts[tema]+=was?-1:1;
+  var el=document.getElementById('c'+tema);
+  if(el)el.textContent=counts[tema];
+}
+</script>
+</body>
+</html>
